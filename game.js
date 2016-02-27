@@ -62,22 +62,22 @@ $(document).ready(function(){
             const y = Math.floor(n / width);
             const x = Math.floor(n % width);
         }
-        const curr = state.MAP[width * y+x];
+        const curr = state.MAP[width*y + x];
         //colorize clicked block, even if nothing else happens
-        colorize(curr);
         const neighbours = getNeighbours(x,y);
-        const neighbourBgColor = curr.css("background-color");
+        const currBgColor = curr.css("background-color");
+        colorize(curr);
         $(neighbours).each((v,i) => {
-            var x2 = i[0];
-            var y2 = i[1];
+            const x2 = i[0];
+            const y2 = i[1];
 
-            const neighbour = state.MAP[width * y2+x2];
-            const currBgColor = curr.css("background-color");
+            const neighbour = state.MAP[width*y2 + x2];
+            const neighbourBgColor = neighbour.css("background-color");
 
             if(colorsEqual(currBgColor, neighbourBgColor)){
                 colorize(neighbour);
             }
-            console.log(neighbour)
+            console.log(x,y,currBgColor, x2,y2, neighbourBgColor, colorsEqual(currBgColor, neighbourBgColor));
         });
     }
 
@@ -86,7 +86,7 @@ $(document).ready(function(){
     }
 
     function colorsEqual(color1, color2){
-        return color1 == color2;
+        return color1 === color2;
     }
 
     // Integer -> Integer -> [[Integer]]
