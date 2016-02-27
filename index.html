@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Swagging around</title>
+        <meta charset="utf-8" />
+        <script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+        <script src="game.js"></script>
+        <style>
+         body {
+             background-color:#e9d9e9;
+         }
+
+         * {
+             box-sizing: border-box;
+         }
+
+         .row:after {
+             content: "";
+             clear: both;
+             display: block;
+         }
+
+         #sel {
+             margin-bottom: 5px;
+         }
+
+         #current_color, div[class*='n-'] {
+             width: 75px;
+             height:75px;
+             border:1px solid lightgray;
+             float:left;
+         }
+
+         #current_color{
+             margin: 5px 0;
+         }
+
+         .n-1 {
+             background-color: #602A30;
+         }
+         .n-2 {
+             background-color: #038A8F;
+         }
+         .n-3 {
+             background-color: #BE9032;
+         }
+         .n-4 {
+             background-color: #BB4921;
+         }
+        </style>
+
+    </head>
+    <body>
+        <div id="sel" class="row menu">
+            <div class="n-1"></div>
+            <div class="n-2"></div>
+            <div class="n-3"></div>
+            <div class="n-4"></div>
+        </div>
+
+        <div class="row">
+            <div id='container'></div>
+        </div>
+    </body>
+</html>
