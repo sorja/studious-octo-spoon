@@ -1,4 +1,5 @@
 window.debug = true;
+if(!window.debug) console.log = function(){}
 $(document).ready(function(){
     // COLOR CONFIGURATION
     const colors = {};
@@ -53,16 +54,12 @@ $(document).ready(function(){
     }
 
     function handleClick(e){
-        const pos = {};
-        pos.n = e.data.i;
-        const width = settings.WIDTH;
-        const height = settings.HEIGHT;
-        with (Math){
-            const n = pos.n;
-            const y = Math.floor(n / width);
-            const x = Math.floor(n % width);
-        }
-        const curr = state.MAP[width*y + x];
+        const pos = indexToPosition(e.data.i);
+        const x = pos[0];
+        const y = pos[1];
+
+
+        const curr = getBlock(x,y);
         //colorize clicked block, even if nothing else happens
         const neighbours = getNeighbours(x,y);
         const currBgColor = curr.css("background-color");
@@ -71,14 +68,34 @@ $(document).ready(function(){
             const x2 = i[0];
             const y2 = i[1];
 
-            const neighbour = state.MAP[width*y2 + x2];
+            const neighbour = getBlock(x2,y2);
             const neighbourBgColor = neighbour.css("background-color");
 
             if(colorsEqual(currBgColor, neighbourBgColor)){
                 colorize(neighbour);
             }
-            console.log(x,y,currBgColor, x2,y2, neighbourBgColor, colorsEqual(currBgColor, neighbourBgColor));
+
         });
+        console.log(getArea(curr, state.MAP, []))
+    }
+
+    function getArea(curr, arr, _){
+        if(!_.length > 0) return _ ;
+        return _;
+    }
+
+    function getBlock(x,y){
+        const width = settings.WIDTH;
+        return state.MAP[width*y + x];
+    }
+
+    function indexToPosition(i){
+        const width = settings.WIDTH;
+        with (Math){
+            const y = Math.floor(i / width);
+            const x = Math.floor(i % width);
+        }
+        return [x,y];
     }
 
     function colorize(element){
