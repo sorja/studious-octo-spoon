@@ -3,7 +3,7 @@ if(!window.debug) console.log = function(){}
 $(document).ready(function(){
     // COLOR CONFIGURATION
     const colors = {};
-    colors.RED = "#602A30";
+    colors.RED = "rgb(96, 42, 48)";
     colors.BLUE = "#038A8F";
     colors.YELLOW = "#BE9032";
     colors.ORANGE = "#BB4921";
@@ -23,11 +23,12 @@ $(document).ready(function(){
     settings.CONTAINER = $("#container");
     settings.SELECTION = $("#sel");
     settings.WIDTH = 8; // One box is 75 pixels ; 8 columns
-    settings.HEIGHT = 4; // One box is 75 pixels ; 4 rows
+    settings.HEIGHT = 10; // One box is 75 pixels ; 4 rows
 
     //GAME STATE
     const state = {};
     state.MAP = [];
+    state.TRIES = 0;
 
     function init(){
         setupGrid();
@@ -41,9 +42,9 @@ $(document).ready(function(){
             $(v).on('click', function(a){
                 //Lazy hack
                 const n = a.target.className.split("-")[1];
-                var color = colors.CURRENT = colors.get(n);
-                $(color_selectors).css("margin", "inital");
-                $(v).css("margin-top", "2px");
+                var color = colors.CURRENT = $(v).css('background-color');
+                $(color_selectors).css("margin-top", "0");
+                $(v).css("margin-top", "2px");////////////;
             })
         });
         //refactor
@@ -55,33 +56,38 @@ $(document).ready(function(){
 
     function handleClick(e){
         const pos = indexToPosition(e.data.i);
-        const x = pos[0];
-        const y = pos[1];
-
-
-        const curr = getBlock(x,y);
-        //colorize clicked block, even if nothing else happens
-        const neighbours = getNeighbours(x,y);
-        const currBgColor = curr.css("background-color");
-        colorize(curr);
-        $(neighbours).each((v,i) => {
-            const x2 = i[0];
-            const y2 = i[1];
-
-            const neighbour = getBlock(x2,y2);
-            const neighbourBgColor = neighbour.css("background-color");
-
-            if(colorsEqual(currBgColor, neighbourBgColor)){
-                colorize(neighbour);
-            }
-
-        });
-        console.log(getArea(curr, state.MAP, []))
+        recursivelySetColor(null, pos);
+        $("#tries").html(state.TRIES);
+        state.TRIES++;
     }
 
-    function getArea(curr, arr, _){
-        if(!_.length > 0) return _ ;
-        return _;
+    function recursivelySetColor(prevColor, node){
+        if(!node) return;
+
+        const x             = node[0];
+        const y             = node[1];
+        const nodeBlock     = getBlock(x,y);
+        const nodeColor     = getColor(nodeBlock);
+
+        if(colorsEqual(nodeColor, colors.CURRENT)){
+            return;
+        }
+
+        //Making sure that prevNodeColor is not null
+        if(prevColor && !colorsEqual(prevColor, nodeColor)) {
+            return;
+        }
+
+        colorize(nodeBlock);
+        const _ = getNeighbours(x,y);
+
+        _.map((v,i) => {
+            recursivelySetColor(nodeColor, v);
+        })
+    }
+
+    function getBlocks(arr){
+        return arr.map(getBlock);
     }
 
     function getBlock(x,y){
@@ -102,19 +108,29 @@ $(document).ready(function(){
         $(element).css('background-color', colors.CURRENT);
     }
 
+    function blocksHaveSameBGColor(block1, block2){
+        return colorsEqual(getColor(block1), getColor(block2));
+    }
+
     function colorsEqual(color1, color2){
         return color1 === color2;
     }
 
+    function getColor(block){
+        return block.css('background-color');
+    }
+
     // Integer -> Integer -> [[Integer]]
     function getNeighbours(x,y){
+        if (typeof x !== 'number') {
+            console.error(x);
+        }
+        if (typeof y !== 'number') {
+            console.error(y);
+        }
         const width = settings.WIDTH;
         const map = state.MAP;
-        const curr = state.MAP[width * y+x];
-        //for(var i = -1; i < 2; i += 2){
-        //    console.log("X+i:", state.MAP[width * y+(x+i)]);
-        //    console.log("Y+i:", state.MAP[width * (y+i)+x]);
-        //}
+        const curr = getBlock(x,y)
 
         const up = [x, y-1];
         const down = [x, y+1];
@@ -134,10 +150,10 @@ $(document).ready(function(){
     function outOfBorders(block){
         const x = block[0];
         const y = block[1];
-        const width = settings.WIDTH-1;
-        const height = settings.HEIGHT-1;
-        return (x < 0 || x > width ) ||
-            (y < 0 || y > height);
+        const width = settings.WIDTH;
+        const height = settings.HEIGHT;
+        return (x < 0 || x > width-1 ) ||
+            (y < 0 || y > height-1);
     }
 
     function notOutsideOfBorders(block){
@@ -169,6 +185,7 @@ $(document).ready(function(){
 
     //init
     init();
+
     if(window.debug){
         //Click something cause can't bother to move my mouse
         with(Math){
